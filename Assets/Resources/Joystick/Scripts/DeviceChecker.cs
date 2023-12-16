@@ -1,5 +1,7 @@
 using System;
+using System.Collections;
 using UnityEngine;
+using YG;
 
 public class DeviceChecker : MonoBehaviour
 {
@@ -7,9 +9,31 @@ public class DeviceChecker : MonoBehaviour
 
     private void Start()
     {
-        if (SystemInfo.deviceType == DeviceType.Handheld)
+        Cursor.lockState = CursorLockMode.Locked;
+        StartCoroutine(GetDataDevice());
+    }
+
+    private IEnumerator GetDataDevice()
+    {
+        float expectedTimer = 0;
+        float timer = 0.25f;
+        
+        while (expectedTimer < 80)
         {
-            joyStick.SetActive(true);
+            if (YandexGame.SDKEnabled)
+            {
+                CheckDevice();
+            }
+
+            expectedTimer += timer;
+            yield return new WaitForSeconds(timer);
         }
+    }
+
+    private void CheckDevice()
+    {
+        if(YandexGame.EnvironmentData.deviceType == "mobile") joyStick.SetActive(true);
+
+        else Destroy(joyStick);
     }
 }
